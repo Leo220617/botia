@@ -117,7 +117,13 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_question))
 
     print("✅ Bot corriendo en Render 24/7...")
-    app.run_polling(stop_signals=None)
+    app.run_webhook(
+    listen="0.0.0.0",
+    port=int(os.environ.get("PORT", 8443)),
+    url_path=BOT_TOKEN,
+    webhook_url=f"https://{os.environ.get('RENDER_EXTERNAL_HOSTNAME')}/{BOT_TOKEN}"
+)
+
 
 
 if __name__ == "__main__":

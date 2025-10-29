@@ -4,11 +4,12 @@ services:
     env: python
     plan: free
     buildCommand: |
-      echo "🧹 Limpiando entorno..."
-      rm -rf .venv*
-      pip install --upgrade pip
-      pip install --no-cache-dir -r requirements.txt
-    startCommand: "python bot_educonnect.py"
+      echo "🧹 Eliminando entornos viejos..."
+      rm -rf venv_bot
+      python3 -m venv venv_bot
+      venv_bot/bin/pip install --upgrade pip
+      venv_bot/bin/pip install --no-cache-dir python-telegram-bot==20.8 requests==2.32.3
+    startCommand: "venv_bot/bin/python bot_educonnect.py"
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.3

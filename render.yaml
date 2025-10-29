@@ -7,4 +7,4 @@ services:
     startCommand: "python bot_educonnect.py"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.12.3
+        value: 3.11.9   # 👈 usa esta versión

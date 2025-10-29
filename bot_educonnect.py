@@ -1,4 +1,3 @@
-import asyncio
 import requests
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
@@ -6,7 +5,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, Con
 # ============================
 # CONFIGURACIÓN
 # ============================
-BOT_TOKEN = "8344802184:AAE8DEKP-8mKIFIF425X7g_OQCYZUBNG7qM"  # 👈 pon el real
+BOT_TOKEN = "8344802184:AAE8DEKP-8mKIFIF425X7g_OQCYZUBNG7qM"
 LOGIN_URL = "https://edu-connect-be-e0f9gxg3akdnase4.centralus-01.azurewebsites.net/v1/users/login"
 BACKEND_URL = "https://edu-connect-be-e0f9gxg3akdnase4.centralus-01.azurewebsites.net/api/bot/query-ai"
 
@@ -17,6 +16,7 @@ BOT_CREDENTIALS = {
 
 jwt_token = None
 user_sessions = {}
+
 
 # ============================
 # AUTENTICACIÓN JWT
@@ -35,14 +35,10 @@ def obtener_jwt():
             jwt_token = token_header.split(" ", 1)[1].strip()
         else:
             jwt_token = token_header
-
         if not jwt_token:
             jwt_token = response.json().get("token") or response.json().get("jwt")
 
-        if jwt_token:
-            print("✅ JWT obtenido correctamente.")
-        else:
-            print("⚠️ No se encontró token.")
+        print("✅ JWT obtenido correctamente.")
     except Exception as e:
         print("❌ Error al obtener JWT:", e)
         jwt_token = None
@@ -101,21 +97,28 @@ async def handle_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 # ============================
-# MAIN
+# MAIN (sin asyncio.run)
 # ============================
-async def main():
-    print("📦 python-telegram-bot versión moderna activa (20.8)")
+def main():
+    import telegram
+    print(f"📦 python-telegram-bot versión: {telegram.__version__}")
     print("🚀 Iniciando EduConnect Bot...")
     obtener_jwt()
 
-    app = ApplicationBuilder().token(BOT_TOKEN).build()
+    app = (
+        ApplicationBuilder()
+        .token(BOT_TOKEN)
+        .concurrent_updates(True)
+        .build()
+    )
+
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.Regex(r"@"), handle_email))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_question))
 
-    print("✅ Bot corriendo correctamente en Render 24/7...")
-    await app.run_polling()
+    print("✅ Bot corriendo en Render 24/7...")
+    app.run_polling(stop_signals=None)
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

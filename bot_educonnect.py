@@ -1,13 +1,12 @@
-import os
+import asyncio
 import requests
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
-import telegram
-print("📦 python-telegram-bot version:", telegram.__version__)
+
 # ============================
 # CONFIGURACIÓN
 # ============================
-BOT_TOKEN = os.getenv("BOT_TOKEN", "TU_TOKEN_AQUI")  # Render usa la variable de entorno
+BOT_TOKEN = "8344802184:AAE8DEKP-8mKIFIF425X7g_OQCYZUBNG7qM"  # 👈 pon el real
 LOGIN_URL = "https://edu-connect-be-e0f9gxg3akdnase4.centralus-01.azurewebsites.net/v1/users/login"
 BACKEND_URL = "https://edu-connect-be-e0f9gxg3akdnase4.centralus-01.azurewebsites.net/api/bot/query-ai"
 
@@ -19,9 +18,8 @@ BOT_CREDENTIALS = {
 jwt_token = None
 user_sessions = {}
 
-
 # ============================
-# JWT LOGIN
+# AUTENTICACIÓN JWT
 # ============================
 def obtener_jwt():
     global jwt_token
@@ -36,12 +34,15 @@ def obtener_jwt():
         if token_header and token_header.lower().startswith("bearer "):
             jwt_token = token_header.split(" ", 1)[1].strip()
         else:
-            jwt_token = token_header or response.json().get("token")
+            jwt_token = token_header
+
+        if not jwt_token:
+            jwt_token = response.json().get("token") or response.json().get("jwt")
 
         if jwt_token:
             print("✅ JWT obtenido correctamente.")
         else:
-            print("⚠️ No se encontró token en headers ni body.")
+            print("⚠️ No se encontró token.")
     except Exception as e:
         print("❌ Error al obtener JWT:", e)
         jwt_token = None
@@ -53,7 +54,7 @@ def obtener_jwt():
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "👋 ¡Hola! Soy el asistente inteligente de EduConnect.\n\n"
-        "Por favor, envíame tu correo institucional para identificarte."
+        "Por favor, envíame tu correo institucional para identificarte (ejemplo: estudiante@edu-connect.com)."
     )
 
 
@@ -61,7 +62,12 @@ async def handle_email(update: Update, context: ContextTypes.DEFAULT_TYPE):
     correo = update.message.text.strip()
     if "@" in correo and "." in correo:
         user_sessions[update.effective_chat.id] = correo
-        await update.message.reply_text(f"✅ Correo registrado: {correo}\nAhora puedes hacerme preguntas.")
+        await update.message.reply_text(
+            f"✅ Correo registrado: {correo}\n\n"
+            "Ahora puedes hacerme preguntas como:\n"
+            "👉 '¿Qué cursos tengo?'\n"
+            "👉 '¿Cuándo termina el curso de Algoritmos?'"
+        )
     else:
         await update.message.reply_text("⚠️ Ese no parece un correo válido. Intenta de nuevo.")
 
@@ -82,6 +88,7 @@ async def handle_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         payload = {"correo": correo, "pregunta": pregunta}
         headers = {"Authorization": f"Bearer {jwt_token}"}
+
         response = requests.post(BACKEND_URL, json=payload, headers=headers, timeout=40)
         data = response.json()
 
@@ -94,22 +101,21 @@ async def handle_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 # ============================
-# MAIN APP (v20+)
+# MAIN
 # ============================
 async def main():
+    print("📦 python-telegram-bot versión moderna activa (20.8)")
     print("🚀 Iniciando EduConnect Bot...")
     obtener_jwt()
 
     app = ApplicationBuilder().token(BOT_TOKEN).build()
-
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.Regex(r"@"), handle_email))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_question))
 
-    print("✅ Bot ejecutándose... (modo Render 24/7)")
+    print("✅ Bot corriendo correctamente en Render 24/7...")
     await app.run_polling()
 
 
 if __name__ == "__main__":
-    import asyncio
     asyncio.run(main())

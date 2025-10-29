@@ -3,8 +3,8 @@ services:
     name: educonnect-bot
     env: python
     plan: free
-    buildCommand: "echo 'Build completo. Nada que instalar aquí.'"
-    startCommand: "./start.sh"
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python bot_educonnect.py"
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.3

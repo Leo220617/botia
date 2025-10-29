@@ -1,13 +1,12 @@
+import os
 import requests
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
-import os
-import telegram
-print("📦 python-telegram-bot version:", telegram.__version__)
+
 # ============================
 # CONFIGURACIÓN
 # ============================
-BOT_TOKEN = os.getenv("BOT_TOKEN", "TU_TOKEN_AQUI")  # ⚙️ Render lo usa como variable de entorno
+BOT_TOKEN = os.getenv("BOT_TOKEN", "TU_TOKEN_AQUI")  # Render usa la variable de entorno
 LOGIN_URL = "https://edu-connect-be-e0f9gxg3akdnase4.centralus-01.azurewebsites.net/v1/users/login"
 BACKEND_URL = "https://edu-connect-be-e0f9gxg3akdnase4.centralus-01.azurewebsites.net/api/bot/query-ai"
 
@@ -94,20 +93,22 @@ async def handle_question(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 # ============================
-# MAIN APP
+# MAIN APP (v20+)
 # ============================
-def main():
+async def main():
     print("🚀 Iniciando EduConnect Bot...")
     obtener_jwt()
 
     app = ApplicationBuilder().token(BOT_TOKEN).build()
+
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.Regex(r"@"), handle_email))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_question))
 
     print("✅ Bot ejecutándose... (modo Render 24/7)")
-    app.run_polling()
+    await app.run_polling()
 
 
 if __name__ == "__main__":
-    main()
+    import asyncio
+    asyncio.run(main())

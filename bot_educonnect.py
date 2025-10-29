@@ -2,7 +2,8 @@ import os
 import requests
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, filters
-
+import telegram
+print("📦 python-telegram-bot version:", telegram.__version__)
 # ============================
 # CONFIGURACIÓN
 # ============================

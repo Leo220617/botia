@@ -4,7 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: |
-      echo "🧹 Eliminando entornos viejos..."
+      echo "🧹 Eliminando entornos anteriores..."
       rm -rf venv_bot
       python3 -m venv venv_bot
       venv_bot/bin/pip install --upgrade pip

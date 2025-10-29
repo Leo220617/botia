@@ -3,7 +3,10 @@ services:
     name: educonnect-bot
     env: python
     plan: free
-    buildCommand: "pip install -r requirements.txt"
+    buildCommand: |
+      rm -rf .venv
+      pip install --upgrade pip
+      pip install --no-cache-dir -r requirements.txt
     startCommand: "python bot_educonnect.py"
     envVars:
       - key: PYTHON_VERSION

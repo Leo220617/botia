@@ -7,8 +7,8 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, Con
 # CONFIGURACIÓN
 # ============================
 BOT_TOKEN = "8344802184:AAE8DEKP-8mKIFIF425X7g_OQCYZUBNG7qM"
-LOGIN_URL = "https://edu-connect-be-e0f9gxg3akdnase4.centralus-01.azurewebsites.net/v1/users/login"
-BACKEND_URL = "https://edu-connect-be-e0f9gxg3akdnase4.centralus-01.azurewebsites.net/api/bot/query-ai"
+LOGIN_URL = "https://edu-connect-be-api-fbhphvbmd9e4h7gu.centralus-01.azurewebsites.net/v1/users/login"
+BACKEND_URL = "https://edu-connect-be-api-fbhphvbmd9e4h7gu.centralus-01.azurewebsites.net/api/bot/query-ai"
 
 BOT_CREDENTIALS = {
     "username": "estudiante@edu-connect.com",
